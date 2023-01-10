@@ -9,7 +9,11 @@ public class PlayerControl : MonoBehaviour
 
     [SerializeField] private LayerMask groundLayerMask;
 
-    private float moveInput;
+    private float verticalInput;
+    private float horizontalInput;
+
+    private bool isMoving;
+
     [SerializeField] private float moveSpeed;
     [SerializeField] private float accel;
     [SerializeField] private float decel;
@@ -30,59 +34,31 @@ public class PlayerControl : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        moveInput = Input.GetAxis("Horizontal");
+        verticalInput = Input.GetAxisRaw("Vertical");
+        horizontalInput = Input.GetAxisRaw("Horizontal");
 
-        if (moveInput != 0)
+        if (verticalInput != 0.0f || horizontalInput != 0)
         {
-            float targetMoveSpeed = moveInput * moveSpeed;
-            float speedDif = targetMoveSpeed - rb.velocity.x;
-            float accelRate = (Mathf.Abs(targetMoveSpeed) > 0.01f) ? accel : decel;
-
-            float movement = Mathf.Pow(Mathf.Abs(speedDif) * accelRate, velocity) * Mathf.Sign(speedDif);
-
-            rb.AddForce(movement * Vector2.right);
-        }
-
-        if (Input.GetKey(KeyCode.Space) && isGrounded())
-        {
-            Jump();
+            isMoving = true;
         }
     }
 
-    private bool isGrounded()
+    private void FixedUpdate()
     {
-        float extraDistance = 0.15f;
-        RaycastHit2D raycast = Physics2D.BoxCast(bc.bounds.center, bc.bounds.size, 0f, Vector2.down, extraDistance, groundLayerMask);
-
-        Color raycolor;
-        if (raycast.collider != null)
-        {
-            raycolor = Color.green;
-        }
-        else
-        {
-            raycolor = Color.red;
-        }
-
-        Debug.DrawRay(bc.bounds.center + new Vector3(bc.bounds.extents.x, 0), Vector2.down * (bc.bounds.extents.y + extraDistance), raycolor);
-        Debug.DrawRay(bc.bounds.center - new Vector3(bc.bounds.extents.x, 0), Vector2.down * (bc.bounds.extents.y + extraDistance), raycolor);
-        Debug.DrawRay(bc.bounds.center - new Vector3(bc.bounds.extents.x, bc.bounds.extents.y + extraDistance), Vector2.right * (bc.bounds.extents.x), raycolor);
-
-        return raycast.collider != null;
+        Move();
     }
 
-    private void Jump()
+    private void Move()
     {
-        Vector2 jumpVelocity = new Vector2(0.0f, jumpForce);
-        rb.velocity += jumpVelocity;
+        if (horizontalInput != 0 && isMoving)
+        {
+            rb.AddForce(Vector2.right * horizontalInput * moveSpeed);
+        }
 
-        if (rb.velocity.y < 0)
+        if (verticalInput != 0 && isMoving)
         {
-            rb.gravityScale = GScale * fallingGravity;
+            rb.AddForce(Vector2.up * verticalInput * moveSpeed);
         }
-        else
-        {
-            rb.gravityScale = GScale;
-        }
+        
     }
 }
