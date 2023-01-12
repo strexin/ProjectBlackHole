@@ -9,11 +9,15 @@ public class FinishBarrier : MonoBehaviour
 
     [SerializeField] private float nextLevelPos;
 
+    [SerializeField] private PlayerControl player;
+
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.gameObject.CompareTag("Player") && collision.gameObject.transform.position.x > nextLevelPos)
+        //Next level border
+        if (collision.gameObject.CompareTag("Player") && player.isAlive)
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+
             /*gameObject.GetComponent<BoxCollider2D>().isTrigger = false;
             gameObject.GetComponent<SpriteRenderer>().enabled = true;
             Camera.main.transform.position = new Vector3(nextCameraPosX, nextCameraPosY, -10.0f);*/
