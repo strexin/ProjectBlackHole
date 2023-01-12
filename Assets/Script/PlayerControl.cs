@@ -5,21 +5,15 @@ using UnityEngine;
 public class PlayerControl : MonoBehaviour
 {
     Rigidbody2D rb;
-    BoxCollider2D bc;
-
-    [SerializeField] private LayerMask groundLayerMask;
+    CircleCollider2D cd;
 
     private float verticalInput;
     private float horizontalInput;
 
     private bool isMoving;
+    private bool isAlive;
 
     [SerializeField] private float moveSpeed;
-    [SerializeField] private float accel;
-    [SerializeField] private float decel;
-    [SerializeField] private float velocity;
-    [SerializeField] private float jumpForce;
-    [SerializeField] private float fallingGravity;
 
     private float GScale;
 
@@ -27,7 +21,7 @@ public class PlayerControl : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        bc = GetComponent<BoxCollider2D>();
+        cd = GetComponent<CircleCollider2D>();
         GScale = rb.gravityScale;
     }
 
@@ -60,5 +54,19 @@ public class PlayerControl : MonoBehaviour
             rb.AddForce(Vector2.up * verticalInput * moveSpeed);
         }
         
+    }
+
+    private void Die()
+    {
+        isAlive = false;
+        Destroy(gameObject);
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (isAlive)
+        {
+            Die();
+        }      
     }
 }
